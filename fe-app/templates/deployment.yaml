@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      type: front
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        type: front
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}-nextjs
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          ports:
+            - name: {{ .Chart.Name }}-nextjs
+              containerPort: {{ .Values.image.port }}
+              protocol: TCP
+          envFrom:
+          - configMapRef:
+              name: {{ .Chart.Name }}-configmap
+          - secretRef:
+              name: fe-app-secrets
